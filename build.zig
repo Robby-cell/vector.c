@@ -1,7 +1,6 @@
 const std = @import("std");
 
-const c_src = &.{
-    "main.c",
+const c_lib_src = &.{
     "vector.c",
 };
 
@@ -15,12 +14,28 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    inline for (c_src) |src_file| {
-        exe.addCSourceFile(.{
+    exe.addCSourceFile(.{
+        .file = .{ .path = "src/main.c" },
+        .flags = &.{},
+    });
+
+    const lib = b.addStaticLibrary(.{
+        .name = "vector",
+        .target = target,
+        .optimize = optimize,
+    });
+    inline for (c_lib_src) |src_file| {
+        lib.addCSourceFile(.{
             .file = .{ .path = "src/" ++ src_file },
             .flags = &.{},
         });
     }
+    lib.linkLibC();
+
+    b.installArtifact(lib);
+
+    exe.linkLibrary(lib);
+
     exe.linkLibC();
 
     b.installArtifact(exe);

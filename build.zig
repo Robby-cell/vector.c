@@ -2,6 +2,7 @@ const std = @import("std");
 
 const c_src = &.{
     "main.c",
+    "vector.c",
 };
 
 pub fn build(b: *std.Build) void {
